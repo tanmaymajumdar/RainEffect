@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Canvas Rain Effect</title>
+<style type="text/css">
+body {
+  margin: 0;
+  overflow: hidden;
+  background-image: url("https://wallpapercave.com/wp/Gn6c2Wp.jpg");
+}
+</style>
+
+<body onmousemove  = "mouseMove(event)">
+
+<canvas id="canvas"></canvas>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script type="text/javascript">
+
+    var mouseX , mouseY;
+
+function mouseMove(event){
+  mouseX = event.clientX;
+  mouseY = event.clientY;
+
+  //console.log(mouseX +","+mouseY);
+}
+
+$(document).ready(function() {
+
+
+        var canvas = $('#canvas')[0];
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        var ww = canvas.width;
+
+        var totalParticlesDrawn =  0;
+
+        if(canvas.getContext) {
+          var drawingPlane = canvas.getContext("2d");
+          var w = canvas.width;
+          var h = canvas.height;
+
+          //clear the whole drawing
+
+          drawingPlane.clearRect(0,0,w,h);
+          var droplets = [];
+
+          //creating droplets
+          let num_of_particles = 10001 ;
+
+          for(var i = 0 ;i < num_of_particles ; i++ ) {
+            x = Math.random()*w;
+            y = Math.random()*h;
+            l = .6;
+            xs = -4 + Math.random()*4 + 2;
+            ys = Math.random()*10 + 10;
+            droplets[i] = {x:x , y:y , xs:xs , ys:ys,l:l , oldX:0 , oldY: 0 , hitByMouse : false } ;
+          }
+
+          function draw(){
+
+          drawingPlane.clearRect(0,0,w,h);
+
+          for(var i2 = 0 ; i2 < num_of_particles ; i2++) {
+
+          drawingPlane.strokeStyle = 'rgba(255,255,255,1)';
+          drawingPlane.lineWidth = 1;
+          drawingPlane.lineCap  = 'round';
+
+          let offsetMouse = 50;
+
+          if(Math.abs(droplets[i2].x - mouseX) < offsetMouse
+          && Math.abs(droplets[i2].y - mouseY) < offsetMouse)
+           {
+
+            droplets[i2].hitByMouse = true;
+            droplets[i2].oldX = droplets[i2].x;
+            droplets[i2].oldY = droplets[i2].y;
+
+            let offset = droplets[i2].x - mouseX;
+            let offsetY = droplets[i2].y - mouseY;
+
+            if(offset < 0) {
+              droplets[i2].x += offset;
+              droplets[i2].xs += offset ;
+            }
+
+            else {
+              droplets[i2].x -=offset;
+             droplets[i2].xs -= offset;
+
+            }
+
+            droplets[i2].y += offsetY;
+            droplets[i2].ys +=offsetY;
+
+          }else{
+
+          }
+
+          drawingPlane.beginPath();
+          drawingPlane.moveTo(droplets[i2].x,droplets[i2].y);
+          drawingPlane.lineTo(droplets[i2].xs*droplets[i2].l+droplets[i2].x,droplets[i2].ys*droplets[i2].l+droplets[i2].y);
+          drawingPlane.stroke();
+
+        }
+
+          droplets.forEach((currentValue2 , index , arr) => {
+            currentValue = droplets[index];
+            //console.log("droplet at "+ index + " is "+ currentValue.toLocaleString());
+
+            if(currentValue.hitByMouse) {
+              currentValue.hitByMouse = false;
+              if(Math.abs(currentValue.x - currentValue.oldX) > 10 ) {
+                currentValue.x = currentValue.oldX;
+                currentValue.ys = Math.random()*10 + 10;
+              }
+            }
+
+            currentValue.x += currentValue.xs;
+            currentValue.y += currentValue.ys;
+
+            if(currentValue.x > w || currentValue.y > h || currentValue.x < 0 || currentValue.y < 0  ){
+              currentValue.x = Math.random()*w;
+              currentValue.y = 0;
+            }
+            //  console.log(currentValue.x + "," + currentValue.y);
+
+            droplets[index] = currentValue;
+
+          });
+
+          totalParticlesDrawn++;
+
+
+        }
+
+
+
+        setInterval(draw , 30);
+
+
+      }
+
+  }
+);
+	</script>
+</body>
+
+
+
+</html>
